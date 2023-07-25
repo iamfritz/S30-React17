@@ -13,7 +13,7 @@ const Member = (props) => (
     <td>
       <ul>
         {props.member.roles.map((role, sIndex) => {
-          return <li> {role.name} </li>;
+          return <li> {role} </li>;
         })}
       </ul>
     </td>
@@ -32,8 +32,8 @@ const Member = (props) => (
 
 const MembersList = () => {
   const [members, setMembers] = useState([]);
-  const [role, setRole]       = useState("");
-     
+  const [role, setRole] = useState("");
+  const [selectedRole, setSelectedRole] = useState("all");
 
   useEffect(() => {
     axios
@@ -46,7 +46,16 @@ const MembersList = () => {
         console.error("Error fetching members data:", error);
       });
   }, []);
-  
+
+  const filteredMembers =
+    selectedRole === "all"
+      ? members
+      : members.filter((member) => member.roles.includes(selectedRole));
+
+  const filterByRole = (event) => {
+    setSelectedRole(event.target.value);
+  };
+
   const deleteMember = (id) => {
     if (!window.confirm("Are you sure you want to delete the record?")) {
       return false;
@@ -58,20 +67,17 @@ const MembersList = () => {
         console.log("Record deleted successfully.");
 
         const newMembers = members.filter((el) => el.id !== id);
-        setMembers(newMembers);        
+        setMembers(newMembers);
       })
       .catch((error) => {
         console.error("Error deleting record:", error);
       });
-  };  
+  };
 
   function recordList() {
-    return members.map((member) => {
+    return filteredMembers.map((member) => {
       return (
-        <Member
-          member={member}
-          deleteMember={() => deleteMember(member.id)}
-        />
+        <Member member={member} deleteMember={() => deleteMember(member.id)} />
       );
     });
   }
@@ -88,6 +94,17 @@ const MembersList = () => {
                   <h2 className="fw-bold mb-2 text-uppercase ">Member List</h2>
                 </Col>
                 <Col className="text-end" xs={12} sm={12} md={6} lg={6}>
+                  <select
+                    onChange={filterByRole}
+                    className="form-control"
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="Author">Author</option>
+                    <option value="Editor">Editor</option>
+                    <option value="Subscriber">Subscriber</option>
+                    <option value="Administrator">Administrator</option>
+                  </select>
+                  {role}
                 </Col>
               </Row>
 
