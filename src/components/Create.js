@@ -7,6 +7,7 @@ var api_url = process.env.REACT_APP_API_URL;
 const Create = () => {
 
   const [message, setMessage] = useState(false);
+  const [error, setError] = useState(false);
 
   const resetForm = () => {
     setFormData({
@@ -70,13 +71,13 @@ const Create = () => {
           resetForm();
           window.location.href = "/";
         } else {
-          console.log(data.message);
-          alert("Error submitting form.");
+          let errorMessage = Object.entries(data.message);
+          setError(errorMessage);          
         }
       })
       .catch((error) => {
-        console.log(error.response.data.message);
-        alert("Error submitting form.");
+        let errorMessage = Object.entries(error.response.data.message);        
+        setError(errorMessage);
       });
   };
 
@@ -89,9 +90,7 @@ const Create = () => {
             <Card className="shadow">
               <Card.Body>
                 <div className="mb-3 mt-md-4">
-                  <h2 className="fw-bold mb-2 text-uppercase ">
-                    New Member
-                  </h2>
+                  <h2 className="fw-bold mb-2 text-uppercase ">New Member</h2>
                   <div className="mb-3">
                     <Form onSubmit={(e) => handleSubmit(e)}>
                       <Form.Group controlId="formBasicName">
@@ -169,6 +168,17 @@ const Create = () => {
                         <p className="mb-0">
                           You Are Registered in Successfully
                         </p>
+                      </Alert>
+                    ) : (
+                      ""
+                    )}
+                    {error ? (
+                      <Alert variant="danger" className="mt-3">
+                        <ul className="mb-0">
+                          {error.map((err) => (
+                            <li>{err[1]}</li>
+                          ))}
+                        </ul>
                       </Alert>
                     ) : (
                       ""
